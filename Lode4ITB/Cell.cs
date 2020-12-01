@@ -13,16 +13,32 @@ namespace Lode4ITB
     public partial class Cell : UserControl
     {
         int x, y;
-        private CellActionType cellActionType;
+        private CellActionType cellActionType = CellActionType.None;
         public CellActionType CellActionType {
             get { return cellActionType; }
             set {
                 cellActionType = value;
-                BackColor = colors[cellActionType];
+                if(highlighted) {
+                    BackColor = Color.LightBlue;
+                } else {
+                    BackColor = colors[cellActionType];
+                }
             }
         }
 
-        static Dictionary<CellActionType, Color> colors = new Dictionary<CellActionType, Color>();
+        private bool highlighted = false;
+        public bool Highlighted {
+            get { return highlighted; }
+            set {
+                highlighted = value;
+                CellActionType = cellActionType;
+            }
+        }
+
+        static Dictionary<CellActionType, Color> colors = new Dictionary<CellActionType, Color>() {
+            { CellActionType.None, Color.Blue },
+            { CellActionType.Ship, Color.DarkGray }
+        };
 
         public int X => x;
         public int Y => y;

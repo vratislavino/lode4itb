@@ -9,7 +9,6 @@ namespace Lode4ITB
     public enum CellActionType
     {
         None,
-        HighlightedForPlacement,
         Ship,
         Hit, 
         Miss, 
