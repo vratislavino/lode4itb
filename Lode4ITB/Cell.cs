@@ -18,10 +18,15 @@ namespace Lode4ITB
             get { return cellActionType; }
             set {
                 cellActionType = value;
+                
                 if(highlighted) {
                     BackColor = Color.LightBlue;
                 } else {
-                    BackColor = colors[cellActionType];
+                    if(Hidden) {
+                        BackColor = colors[CellActionType.None];
+                    } else {
+                        BackColor = colors[cellActionType];
+                    }
                 }
             }
         }
@@ -31,6 +36,15 @@ namespace Lode4ITB
             get { return highlighted; }
             set {
                 highlighted = value;
+                CellActionType = cellActionType;
+            }
+        }
+
+        private bool hidden = false;
+        public bool Hidden {
+            get { return hidden; }
+            private set {
+                hidden = value;
                 CellActionType = cellActionType;
             }
         }
@@ -53,6 +67,10 @@ namespace Lode4ITB
             this.x = x;
             this.y = y;
             this.Location = new Point(x * Width, y * Height);
+        }
+
+        public void HideCell() {
+            Hidden = true;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Lode4ITB
                     new Ship(new bool[,] {
                         { true, true, true, true, true, true },
                         { false, false, true, true, false, false}
-                    }),
+                    })/*,
                     new Ship(new bool[,] {
                         { false, false, true, false, false },
                         { true, true, true, true, true }
@@ -42,12 +42,12 @@ namespace Lode4ITB
                     }),
                     new Ship(new bool[,] {
                         { true, true}
-                    })
+                    })*/
                 };
         }
 
         public void Place() {
-            MessageBox.Show("Loď umístěna!");
+            //MessageBox.Show("Loď umístěna!");
             Placed?.Invoke();
         }
     }
