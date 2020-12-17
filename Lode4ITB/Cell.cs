@@ -31,6 +31,12 @@ namespace Lode4ITB
             }
         }
 
+        private Ship ship = null;
+        public Ship Ship {
+            get { return ship; }
+            set { ship = value; }
+        }
+
         private bool highlighted = false;
         public bool Highlighted {
             get { return highlighted; }
@@ -49,9 +55,15 @@ namespace Lode4ITB
             }
         }
 
+        Dictionary<int, string> dict;
+
         static Dictionary<CellActionType, Color> colors = new Dictionary<CellActionType, Color>() {
             { CellActionType.None, Color.Blue },
-            { CellActionType.Ship, Color.DarkGray }
+            { CellActionType.Ship, Color.DarkGray },
+            { CellActionType.Hit, Color.DarkRed },
+            { CellActionType.Miss, Color.SkyBlue },
+            { CellActionType.SinkedShip, Color.Black }
+
         };
 
         public int X => x;
@@ -69,8 +81,19 @@ namespace Lode4ITB
             this.Location = new Point(x * Width, y * Height);
         }
 
+        public void ProcessHit() {
+            ship.CellHit(this);
+        }
+
         public void HideCell() {
+            if(CellActionType == CellActionType.None 
+                || CellActionType == CellActionType.Ship)
             Hidden = true;
+        }
+
+        public void RevealCell() {
+            Hidden = false;
+            Highlighted = false;
         }
     }
 }

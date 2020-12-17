@@ -11,15 +11,30 @@ namespace Lode4ITB
     public class Ship
     {
         public event Action Placed;
+        public event Action<Ship> ShipSinked;
 
         private bool[,] shape;
         public bool[,] Shape => shape;
 
         private Point position;
 
+        public List<Cell> cells;
+
+        private bool sinked = false;
+        public bool IsSinked { get { return sinked; } }
+
         public Ship(bool[,] shape) {
             this.shape = shape;
             position = new Point();
+            cells = new List<Cell>();
+        }
+
+        public void CellHit(Cell cell) {
+            if(cells.All(x=>x.CellActionType == CellActionType.Hit)) {
+                cells.ForEach(x=>x.CellActionType = CellActionType.SinkedShip);
+                sinked = true;
+                ShipSinked?.Invoke(this);
+            }
         }
 
         public static List<Ship> CreateShips() {
@@ -27,7 +42,7 @@ namespace Lode4ITB
                     new Ship(new bool[,] {
                         { true, true, true, true, true, true },
                         { false, false, true, true, false, false}
-                    })/*,
+                    }),
                     new Ship(new bool[,] {
                         { false, false, true, false, false },
                         { true, true, true, true, true }
@@ -42,7 +57,7 @@ namespace Lode4ITB
                     }),
                     new Ship(new bool[,] {
                         { true, true}
-                    })*/
+                    })
                 };
         }
 

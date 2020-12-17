@@ -12,6 +12,8 @@ namespace Lode4ITB
 {
     public partial class Sea : UserControl
     {
+        public event Action<Sea> PlayerMissed;
+
         Cell[,] cells = new Cell[10, 10];
 
         GamePhase currentGamePhase;
@@ -51,8 +53,24 @@ namespace Lode4ITB
             }
         }
 
-        private void OnMouseClickFighting(object sender, MouseEventArgs e) {
+        public void RevealShips() {
+            foreach(var cell in cells) {
+                cell.RevealCell();
+            }
         }
+
+        private void OnMouseClickFighting(object sender, MouseEventArgs e) {
+            Cell mouse = (Cell) sender;
+            mouse.RevealCell();
+            if(mouse.CellActionType == CellActionType.Ship) {
+                mouse.CellActionType = CellActionType.Hit;
+                mouse.ProcessHit();
+            } else if(mouse.CellActionType == CellActionType.None){
+                mouse.CellActionType = CellActionType.Miss;
+                PlayerMissed?.Invoke(this);
+            }
+        }
+
         private void OnMouseEnterFighting(object sender, EventArgs e) {
             Cell mouse = (Cell) sender;
             int x = mouse.X;
@@ -72,23 +90,54 @@ namespace Lode4ITB
             int y = mouse.Y;
             Ship ship = Form1.GetCurrentPlayer().CurrentShip;
 
-            for (int i = y; i < ship.Shape.GetLength(1) + y; i++) {
-                for (int j = x; j < ship.Shape.GetLength(0) + x; j++) {
-                    if (i < 10 && j < 10) {
-                        if (ship.Shape[j - x, i - y])
-                            cells[j, i].CellActionType = CellActionType.Ship;
+            if (CheckBorders(ship, x, y) && CheckNeighbours(ship, x, y)) {  // dodělat podmínky pro placement
+
+                for (int i = y; i < ship.Shape.GetLength(1) + y; i++) {
+                    for (int j = x; j < ship.Shape.GetLength(0) + x; j++) {
+                        if (i < 10 && j < 10) {
+                            if (ship.Shape[j - x, i - y]) {
+                                cells[j, i].Ship = ship;
+                                ship.cells.Add(cells[j, i]);
+                                cells[j, i].CellActionType = CellActionType.Ship;
+                            }
+                        }
                     }
                 }
-            }
-
-            if (true) {  // dodělat podmínky pro placement
-                ship.Place(); // Dodělat přepnutí typu lodi na další :) :) 
-
-
+                ship.Place();
                 foreach (var cell in cells) {
                     cell.Highlighted = false;
                 }
             }
+        }
+
+        private bool CheckNeighbours(Ship ship, int x, int y) {
+
+            bool allRight = true;
+            for (int i = y; i < ship.Shape.GetLength(1) + y; i++) {
+                for (int j = x; j < ship.Shape.GetLength(0) + x; j++) {
+                    if (i < 10 && j < 10) {
+                        if (ship.Shape[j - x, i - y]) {
+                            if(!(!IsInSea(j+1, i) || cells[j+1, i].CellActionType != CellActionType.Ship)) {
+                                allRight = false;
+                            }
+                        }
+                    }
+                }
+            }
+            return allRight;
+        }
+
+        private bool IsInSea(int x, int y) {
+            return x < cells.GetLength(0) && x > 0 && y < cells.GetLength(1) && y > 0;
+        }
+
+        private bool CheckBorders(Ship ship, int x, int y) {
+            if(x+ship.Shape.GetLength(0) <= cells.GetLength(0)) {
+                if(y+ship.Shape.GetLength(1) <= cells.GetLength(1)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void OnMouseEnterPositioning(object sender, EventArgs e) {
